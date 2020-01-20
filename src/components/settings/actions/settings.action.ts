@@ -3,7 +3,8 @@ import { Action } from 'redux';
 export enum SettingsActions {
 	ChangeBoardSize = '[Settings] Change Board Size',
 	InitializeGame = '[Settings] Initialize Game',
-	ChangePlayerCount = '[Settings] Change Player Count'
+  ChangePlayerCount = '[Settings] Change Player Count',
+  ResetSettings = '[Settings] Reset Settings'
 }
 
 export interface ChangeBoardSizeSuccess extends Action {
@@ -36,4 +37,12 @@ export const changePlayerCount = (playersCount: number): ChangePlayerCount => ({
 	playersCount,
 });
 
-export type SettingsAction = ChangeBoardSizeSuccess | InitializeGame | ChangePlayerCount;
+export interface ResetSettings extends Action {
+  type: SettingsActions.ResetSettings;
+}
+
+export const resetSettings = (): ResetSettings => ({
+  type: SettingsActions.ResetSettings,
+});
+
+export type SettingsAction = ChangeBoardSizeSuccess | InitializeGame | ChangePlayerCount | ResetSettings;

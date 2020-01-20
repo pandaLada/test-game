@@ -14,7 +14,6 @@ export interface GameStatusState {
 
 export interface PlayersState {
 	count: number;
-	countOptions: number[];
 	current?: number;
 }
 
@@ -42,8 +41,7 @@ const initialState: RootState = {
 		cells: initializeBoardCells(3),
 	},
 	players: {
-		count: 3,
-		countOptions: [3]
+		count: 2,
 	},
 	gameStatus: {
 		gameOver: false,

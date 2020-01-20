@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect, DispatchProp } from 'react-redux';
 import { Action } from 'redux';
 import styled from 'styled-components';
@@ -9,24 +9,36 @@ import Select from '@material-ui/core/Select';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+import OutlinedInput from '@material-ui/core/OutlinedInput';
+import FormHelperText from '@material-ui/core/FormHelperText';
 
 import { RootState } from '../../store/state';
 import { boardSizes } from '../../constants/boardConstants';
 import {
-	changeBoardSize,
-	changePlayerCount,
-	initializeGame,
+  changeBoardSize,
+  changePlayerCount,
+  initializeGame,
+	resetSettings,
 } from '../settings/actions/settings.action';
 
 
-const StyledFormControl = styled(FormControl)`
+const StyledSelectControl = styled(FormControl)`
 	width: 110px;
+`;
+
+const StyledInputControl = styled(FormControl)`
+	width: 230px;
+	margin-bottom: 25px;
 `;
 
 const StyledLabel = styled(InputLabel)`
   background-color: #ffffff; 
 `;
 
+const StyledInputLabel = styled(InputLabel)`
+	margin-left: 10px;
+	margin-top: -8px;
+`;
 const StyledSelect = styled(Select)`
   min-width: 90px; 
   margin-bottom: 25px;
@@ -48,98 +60,104 @@ const SettingsPanel = styled(Grid)`
 `;
 
 interface GameSettingsProps extends DispatchProp<Action> {
-	size: number;
-	gameStarted: boolean;
-	playersCount: number;
-	playersCountOptions: number[];
+  size: number;
+  gameStarted: boolean;
+  playersCount: number;
 }
 
 function GameSettings(props: GameSettingsProps) {
-	const { size, gameStarted, playersCount, playersCountOptions, dispatch } = props;
+  const { size, gameStarted, playersCount, dispatch } = props;
+  const [isError, setIsError] = useState(false);
 
-	function SizeSelect() {
-		return (
-			<StyledFormControl variant="outlined">
-				<StyledLabel id="board-size">
-					Board Size
-				</StyledLabel>
-				<StyledSelect
-					labelId="board-size"
-					native
-					disabled={ gameStarted }
-					value={ size }
-					onChange={ changeSize }
-				>
-					{
-						boardSizes.map((item: number) => {
-							return (<option key={ item } value={ item }>{ item }</option>)
-						})
-					}
-				</StyledSelect>
-			</StyledFormControl>
-		);
-	}
 
-	function PlayersCount() {
+  function SizeSelect() {
+    return (
+      <StyledSelectControl variant="outlined">
+        <StyledLabel id="board-size">
+          Board Size
+        </StyledLabel>
+        <StyledSelect
+          labelId="board-size"
+          native
+          disabled={ gameStarted }
+          value={ size }
+          onChange={ changeSize }
+        >
+          {
+            boardSizes.map((item: number) => {
+              return (<option key={ item } value={ item }>{ item }</option>)
+            })
+          }
+        </StyledSelect>
+      </StyledSelectControl>
+    );
+  }
 
-		return (
-			<StyledFormControl variant="outlined">
-				<StyledLabel id="player-count">
-					Players Count
-				</StyledLabel>
-				<StyledSelect
-					labelId="player-count"
-					native
-					disabled={ gameStarted }
-					value={ playersCount }
-					onChange={ changePlayersCount }
-				>
-					{
-						playersCountOptions.map((item: number) => {
-							return (<option key={ item } value={ item }>{ item }</option>)
-						})
-					}
-				</StyledSelect>
-			</StyledFormControl>
-		);
-	}
+  function PlayersCount() {
 
-	function changeSize(event) {
-		dispatch(changeBoardSize(event.target.value));
-	}
+    return (
+      <StyledInputControl>
+        <StyledInputLabel htmlFor="player-count">Players Count</StyledInputLabel>
+        <OutlinedInput
+          id="player-count"
+          labelWidth={ 100 }
+          type={ 'number' }
+          autoFocus
+          error={ isError }
+          disabled={ gameStarted }
+          value={ playersCount }
+          onChange={ changePlayersCount }
+        />
+        <FormHelperText error={ isError }>Number of players can be from 2 to 10.</FormHelperText>
+      </StyledInputControl>
+    );
+  }
 
-	function changePlayersCount(event) {
-		dispatch(changePlayerCount(event.target.value));
-	}
+  function changeSize(event) {
+    dispatch(changeBoardSize(event.target.value));
+  }
 
-	function startGame() {
-		dispatch(initializeGame())
-	}
+  function changePlayersCount(event) {
+    const value = event.target.value;
 
-	return (
+    setIsError(value > 10 || value < 2);
+
+    dispatch(changePlayerCount(value));
+  }
+
+  function startGame() {
+    dispatch(initializeGame())
+  }
+
+  function resetGame() {
+    dispatch(resetSettings())
+  }
+
+  return (
 		<>
-			<SettingsPanel container>
-				<SettingsTitle variant="h5">
-					Game Settings
-				</SettingsTitle>
-				<Grid item xs={ 12 }>
-					<SizeSelect/>
-				</Grid>
-				<Grid item xs={ 12 }>
-					<PlayersCount/>
-				</Grid>
-				<Button disabled={ gameStarted }
-								onClick={ startGame }>Start Game</Button>
-			</SettingsPanel>
+      <SettingsPanel container>
+        <SettingsTitle variant="h5">
+          Game Settings
+        </SettingsTitle>
+        <Grid item xs={ 12 }>
+          <SizeSelect/>
+        </Grid>
+        <Grid item xs={ 12 }>
+          <PlayersCount/>
+        </Grid>
+        <Button disabled={ gameStarted || isError }
+                onClick={ startGame }>Start Game</Button>
+        <Button disabled={ !gameStarted }
+                onClick={ resetGame }>Reset Game</Button>
+      </SettingsPanel>
 		</>
-	);
+  );
 }
 
 const mapStateToProps = (state: RootState) => ({
-	size: state.board.size,
-	gameStarted: state.gameStatus.gameStarted,
-	playersCount: state.players.count,
-	playersCountOptions: state.players.countOptions
+  size: state.board.size,
+  gameStarted: state.gameStatus.gameStarted,
+  playersCount: state.players.count,
 });
 
 export default connect(mapStateToProps)(GameSettings);

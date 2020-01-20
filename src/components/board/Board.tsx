@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
 import { finishGame, makeStep } from '../board/actions/board.actions';
-import { CellInfo, RootState } from './../../store/state';
+import { CellInfo, RootState, GameStatusState } from './../../store/state';
 
 const BoardCell = styled(Button)`
   max-width: 48px; 
@@ -19,13 +19,23 @@ const BoardCell = styled(Button)`
 
 interface BoardProps extends DispatchProp {
 	cells: CellInfo[][];
-	gameOver: boolean;
-	gameStarted: boolean;
-	winner?: number | string;
+  gameStatus: GameStatusState;
+  currentPlayer?: number;
+  filledCells: number;
 }
 
 function Board(props: BoardProps) {
-	const { cells, dispatch, gameOver, gameStarted, winner } = props;
+  const {
+    cells,
+    dispatch,
+    gameStatus: {
+      gameOver,
+      gameStarted,
+      winner,
+    },
+    currentPlayer,
+    filledCells
+  } = props;
 
 	useEffect(() => {
 		if (gameOver && !winner) {
@@ -34,7 +44,7 @@ function Board(props: BoardProps) {
 	});
 
 	function makeMove(cell) {
-		dispatch(makeStep(cell));
+    dispatch(makeStep(cell, currentPlayer!, cells.length, filledCells));
 	}
 
 	function BoardRow(params) {
@@ -47,9 +57,9 @@ function Board(props: BoardProps) {
 						return (
 							<Grid key={ cell.x + cell.y } item>
 								<BoardCell
-									variant="outlined"
-									disabled={ !gameStarted || gameOver }
-									onClick={ () => makeMove(cell) }
+                  variant="outlined"
+                  disabled={ !gameStarted || gameOver || !!cell.player }
+                  onClick={ () => makeMove(cell) }
 								>
 									{ cell.player || '' }
 								</BoardCell>
@@ -80,9 +90,9 @@ function Board(props: BoardProps) {
 
 const mapStateToProps = (state: RootState) => ({
 	cells: state.board && state.board.cells,
-	gameOver: state.gameStatus.gameOver,
-	gameStarted: state.gameStatus.gameStarted,
-	winner: state.gameStatus && state.gameStatus.winner,
+  gameStatus: state.gameStatus,
+  currentPlayer: state.players && state.players.current,
+  filledCells: state.board && state.board.filledCells
 });
 
 export default connect(mapStateToProps)(Board);

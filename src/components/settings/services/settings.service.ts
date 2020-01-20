@@ -13,15 +13,3 @@ export const initializeBoardCells = (size: number) => {
 
 	return board;
 };
-
-export const calculatePlayersCounts = (boardSize: number) => {
-	let playersCounts: number[] = [];
-
-	for (let i = 2; i <= boardSize; i++) {
-		if (boardSize % i === 0) {
-			playersCounts.push(i);
-		}
-	}
-
-	return playersCounts;
-};

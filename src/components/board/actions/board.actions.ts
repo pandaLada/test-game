@@ -9,11 +9,17 @@ export enum BoardActions {
 export interface MakeStep extends Action {
 	type: BoardActions.MakeStep;
 	step: Coordinates;
+  currentPlayer: number;
+  size: number;
+  filledCells: number;
 }
 
-export const makeStep = (step: Coordinates): MakeStep => ({
+export const makeStep = (step: Coordinates, currentPlayer: number, size: number, filledCells: number): MakeStep => ({
 	type: BoardActions.MakeStep,
 	step,
+  currentPlayer,
+  size,
+  filledCells
 });
 
 export interface FinishGame extends Action {
