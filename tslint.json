@@ -1,0 +1,58 @@
+{
+  "extends": [
+    "tslint-config-airbnb"
+  ],
+  "rules": {
+    "indent": [
+      true,
+      "spaces"
+    ],
+    "align": [
+      true,
+      "parameters",
+      "arguments",
+      "statements"
+    ],
+    "one-line": [
+      true,
+      "check-catch",
+      "check-else",
+      "check-open-brace",
+      "check-whitespace"
+    ],
+    "eofline": false,
+    "function-paren-newline": [
+      "error",
+      "consistent"
+    ],
+    "object-curly-newline": [
+      "error",
+      {
+        "consistent": true
+      }
+    ],
+    "import-name": true,
+    "max-line-length": [
+      true,
+      {
+        "limit": 120
+      }
+    ],
+    "no-this-assignment": false,
+    "object-shorthand-properties-first": false,
+    "variable-name": [
+      true,
+      "check-format",
+      "allow-pascal-case"
+    ]
+  },
+  "env": {
+    "jest": true
+  },
+  "globals": {
+    "localStorage": true,
+    "process": true,
+    "document": true,
+    "window": true
+  }
+}
